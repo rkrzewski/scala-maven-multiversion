@@ -1,0 +1,154 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>test</groupId>
+  <artifactId>test</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <!-- properties common to all profiles -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <junit.version>4.10</junit.version>
+    <jre.version>1.7</jre.version>
+  </properties>
+
+  <!-- profiles for each supported Scala version. A profile must be selected 
+    using -P option on command line in order to build the project. Remember to 
+    invoke clean goal when switching a working copy from one profile to another, 
+    otherwise stale binary files might get packaged into the jar! -->
+  <profiles>
+    <profile>
+      <id>2.9</id>
+      <properties>
+        <scala.version>2.9</scala.version>
+        <scala.target.jvm>1.5</scala.target.jvm>
+        <scala.full.version>2.9.2</scala.full.version>
+        <scalatest.version>2.0.M1</scalatest.version>
+      </properties>
+    </profile>
+    <profile>
+      <id>2.10</id>
+      <properties>
+        <scala.version>2.10</scala.version>
+        <scala.target.jvm>1.7</scala.target.jvm>
+        <scala.full.version>2.10.0-M7</scala.full.version>
+        <scalatest.version>1.9-2.10.0-M7-B1</scalatest.version>
+      </properties>
+    </profile>
+  </profiles>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${scala.full.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_${scala.full.version}</artifactId>
+      <version>${scalatest.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>scala-compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-test-compile</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <scalaVersion>${scala.full.version}</scalaVersion>
+          <args>
+            <arg>-target:jvm-${scala.target.jvm}</arg>
+          </args>
+        </configuration>
+      </plugin>
+
+      <!-- this is needed to put correct JRE on classpath under Eclipse/ScalaIDE/m2e -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <source>${jre.version}</source>
+          <target>${jre.version}</target>
+        </configuration>
+      </plugin>
+
+      <!-- build helper adds additional source folders imperatively -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>build-helper-add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/scala-${scala.version}</source>
+              </sources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>build-helper-add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/test/scala-${scala.version}</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- override project classifier - this build.finalName and is honoured 
+        by install and deploy plugins -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <classifier>${scala.version}</classifier>
+        </configuration>
+      </plugin>
+
+      <!-- this is for demonstration purposes only. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <configuration>
+          <mainClass>test.TestApp</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

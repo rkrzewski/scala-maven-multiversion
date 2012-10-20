@@ -1,0 +1,19 @@
+This is a fairly complete example of a Maven project that builds a set of
+jars for different Scala releases from a source tree composed of shared, and
+Scala release specific sections.
+
+To add support for new scala release, a profile in the POM needs to be
+cloned and unpdate with relevant version numbers, and source and directories
+dedicated to the new release need to be created.
+
+To build & test the project invoke one of the following:
+
+mvn -P2.9 clean install exec:java
+mvn -P2.10 clean install exec:java
+
+To use this project with eclipse you need: ScalaIDE, m2e, m2eclipse-scala
+m2e connctor and buildhelper plugin m2e connector. While importing the
+project into Eclipse, enter profile name into Advanced > Profile field in
+the import dialog, in order to have correct Eclipse classpath generated.
+You can switch the profile throguh project properties context menu > Maven >
+Profiles.
